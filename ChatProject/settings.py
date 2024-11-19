@@ -15,10 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-=m1^$ql(%@l&m_d()&st30d!b^hc5cjl5@9!+*mlheo)v&o(y='
 
@@ -27,11 +23,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['chat-app-wheat-delta.vercel.app', '127.0.0.1', 'localhost']
 
-
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Application definition
+# Channel Layer configuration (use Redis in production)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('127.0.0.1', 6379)],  # Use Redis cloud service in production
+        },
+    },
+}
 
 INSTALLED_APPS = [
     'daphne',
@@ -47,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Use WhiteNoise for serving static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,25 +79,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ChatProject.wsgi.application'
 ASGI_APPLICATION = 'ChatProject.asgi.application'
-CHANNEL_LAYERS = {
-   
-    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
-}
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# Database (using SQLite for simplicity)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -110,23 +103,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
+# Static files (using WhiteNoise)
 STATIC_URL = 'static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

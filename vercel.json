@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "ChatProject/asgi.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "ChatProject/asgi.py" }
+  ]
+}

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=m1^$ql(%@l&m_d()&st30d!b^hc5cjl5@9!+*mlheo)v&o(y=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-[ALLOWED_HOSTS = ['chat-app-rho-beige-18.vercel.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['chat-app-wheat-delta.vercel.app', '127.0.0.1', 'localhost']
 
 
 STATIC_URL = '/static/'

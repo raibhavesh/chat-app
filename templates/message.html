@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    {% load static %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div class="parent">
+        <div class="child-2">
+            <center><h2>{{ room_name }}</h2></center><hr>  
+            <div class="chat-body-parent">
+                <div class="chat-body" id="tasks">
+                    <div class="message" id="chatContainer">
+                        {% for i in messages %}
+                            {% if i.sender != user %}
+                                <div class="receive">
+                                    <p style="color: #000;"> {{i.message}}<strong>-{{i.sender}}</strong></p>
+                                </div>
+                            {% else %}
+                                <div class="send">
+                                    <p style="color: #000;">{{i.message}}</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="form">
+                        <form action="" id="message-form" method="POST">
+                            {% csrf_token %}
+                            <textarea id="msg" cols="30" name="message" rows="10" placeholder="Enter your message" required></textarea>
+                            <button class="submit" type="submit">Send</button>
+                        </form>    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function scrollToBottom() {
+            var chatContainer = document.getElementById("chatContainer");
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        const crypto = require('crypto-js');
+
+const secretKey = "mySecretKey";  // Ensure both client and server use the same key
+
+function encryptMessage(message) {
+    return crypto.AES.encrypt(message, secretKey).toString();
+}
+
+// Encrypt message and send it to the WebSocket
+function sendMessage(message) {
+    const encryptedMessage = encryptMessage(message);
+    websocket.send(JSON.stringify({ message: encryptedMessage }));
+}
+
+        const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+        const wsEndpoint = `${websocketProtocol}://${window.location.host}/ws/notification/{{room_name}}/`;
+        const socket = new WebSocket(wsEndpoint);
+
+        document.getElementById('message-form').addEventListener('submit', function(event){
+            event.preventDefault(); 
+            const message = document.getElementById('msg').value;
+            if (message.trim() !== '') {
+                socket.send(
+                    JSON.stringify({
+                        'message': message,
+                        'room_name': '{{room_name}}',
+                        'sender': '{{user}}',
+                    })
+                );
+                document.getElementById('msg').value = ''; 
+            }
+        });
+
+        document.getElementById('msg').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); 
+                document.getElementById('message-form').submit(); 
+            }
+        });
+
+        document.querySelector('.submit').addEventListener('click', function(event) {
+            event.preventDefault(); 
+            document.getElementById('message-form').submit();
+        });
+
+        socket.addEventListener("message", (event) => {
+            const messageData = JSON.parse(event.data)['message'];
+            console.log(messageData);
+            
+            var sender = messageData['sender'];
+            var message = messageData['message'];
+
+            if (sender == {{user}}){
+                document.getElementById('msg').value = '';
+            }
+            var messageDiv = document.querySelector('.message');
+            if (sender != '{{user}}') { 
+                messageDiv.innerHTML += '<div class="receive"><p style="color: #000;">' + message + '<strong>-' + sender + '</strong></p></div>';
+            } else {
+                messageDiv.innerHTML += '<div class="send"><p style="color: #000;">' + message + '</p></div>';
+            }
+            scrollToBottom();
+        });
+
+        socket.onopen = (event) => {
+            console.log("WebSocket connection opened!");
+        };
+
+        socket.onclose = (event) => {
+            console.log("WebSocket connection closed!");
+        };
+    </script>
+</body>
+<style>
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body {
+    background: linear-gradient(to right, #59C173, #a17fe0, #5D26C1);
+}
+.parent {
+    background-image: url("/static/Chatapp.png");
+}
+
+.chat-body-parent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-body, .message {
+    width: 100%;
+    background-image: url("/static/chatimage.jpeg");
+    border-radius: 10px;
+    display: flex;      
+    padding: 10px;
+    flex-direction: column;
+}
+
+.message {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.chat-body .message .receive, .send {
+    background-color: #B1A296;
+    max-width: 400px;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.chat-body .message .send {
+    align-self: flex-end;
+}
+
+.chat-body .message .receive {
+    align-self: flex-start;
+}
+
+form {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+form textarea {
+    width: 70%;
+    height: 40px;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+form button {
+    width: 25%;
+    padding: 10px;
+    background-color: #FBEEC1;
+    border-radius: 5px;
+    border: none;
+    color: #000;
+}
+
+</style>
+</html>

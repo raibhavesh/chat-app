@@ -29,6 +29,12 @@ txaio==23.1.1
 typing_extensions==4.7.1
 urllib3==2.0.4
 zope.interface==6.0
-channels-redis==4.0.0  # For Redis (if used)
+
+# Channels Redis for Redis integration
+channels-redis==4.0.0  # If using Redis (replace with cloud Redis in production)
+
+# For PostgreSQL support if you're planning to use it in production
+psycopg2-binary==2.9.6  # For PostgreSQL (if used)
+
+# Additional dependencies for production (Whitenoise for static files serving)
 whitenoise==6.5.0
-psycopg2-binary==2.9.6  # If using PostgreSQL

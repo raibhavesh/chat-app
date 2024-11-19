@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['chat-app-wheat-delta.vercel.app', '127.0.0.1', 'localhost']
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # Application definition
 
 INSTALLED_APPS = [
